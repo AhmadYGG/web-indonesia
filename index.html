@@ -3,337 +3,441 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jam Indonesia</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<title>Jam Indonesia — Ramadhan</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #000000;
-    --glow: #00ffe7;
-    --glow2: #0099ff;
-    --text: #ffffff;
-    --dim: rgba(0,255,231,0.15);
-    --dim2: rgba(0,153,255,0.1);
+    --bg-top:    #1a0a2e;
+    --bg-mid:    #2d1b4e;
+    --bg-bot:    #1a0f3a;
+    --gold:      #f5c98a;
+    --gold2:     #e8a96a;
+    --rose:      #f0a8c0;
+    --lavender:  #c9b8f0;
+    --mint:      #a8dfd4;
+    --cream:     #fdf0e0;
+    --star:      #f9e4b0;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: var(--bg);
+    background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-mid) 50%, var(--bg-bot) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
     overflow: hidden;
-    font-family: 'Orbitron', monospace;
-  }
-
-  /* Scanline overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.08) 2px,
-      rgba(0,0,0,0.08) 4px
-    );
-    pointer-events: none;
-    z-index: 99;
-  }
-
-  .wrapper {
-    text-align: center;
+    font-family: 'Quicksand', sans-serif;
     position: relative;
   }
 
-  /* Ambient glow background */
-  .wrapper::before {
-    content: '';
+  /* Stars */
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .star {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px; height: 300px;
-    background: radial-gradient(ellipse, rgba(0,255,231,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+    background: var(--star);
+    animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.12; transform: scale(1); }
+    50%      { opacity: 0.85; transform: scale(1.5); }
+  }
+
+  /* Moon */
+  .moon-wrap {
+    position: fixed;
+    top: 24px; right: 48px;
+    z-index: 2;
+    animation: moon-float 6s ease-in-out infinite;
+  }
+  @keyframes moon-float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+
+  /* Lanterns */
+  .lanterns {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 80px;
     pointer-events: none;
-    animation: pulse-bg 3s ease-in-out infinite;
+    z-index: 2;
+  }
+  .lantern { animation: swing 4s ease-in-out infinite; transform-origin: top center; }
+  .lantern:nth-child(2) { animation-delay: -2s; }
+  @keyframes swing {
+    0%,100% { transform: rotate(-7deg); }
+    50%      { transform: rotate(7deg); }
   }
 
-  @keyframes pulse-bg {
-    0%, 100% { opacity: 0.6; transform: translate(-50%,-50%) scale(1); }
-    50% { opacity: 1; transform: translate(-50%,-50%) scale(1.05); }
+  /* Mosque */
+  .mosque-wrap {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+    opacity: 0.13;
   }
 
-  /* Timezone label */
+  /* Main */
+  .wrapper {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 24px 40px 32px;
+  }
+
+  .greeting {
+    font-size: clamp(13px, 1.8vw, 17px);
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    opacity: 0.8;
+  }
+
+  .ramadhan-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 700;
+    letter-spacing: 7px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--rose) 55%, var(--lavender) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(245,201,138,0.35));
+    margin-bottom: 26px;
+  }
+
+  /* TZ buttons */
   .tz-row {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     justify-content: center;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
+    margin-bottom: 22px;
   }
-
   .tz-btn {
-    background: transparent;
-    border: 1px solid rgba(0,255,231,0.3);
-    color: rgba(0,255,231,0.5);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    padding: 4px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-  }
-
-  .tz-btn:hover, .tz-btn.active {
-    border-color: var(--glow);
-    color: var(--glow);
-    background: var(--dim);
-    box-shadow: 0 0 12px rgba(0,255,231,0.2);
-  }
-
-  /* Main clock digits */
-  .clock {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    position: relative;
-  }
-
-  .digit-group {
-    display: flex;
-    gap: 2px;
-  }
-
-  .digit {
-    font-size: clamp(72px, 14vw, 120px);
-    font-weight: 900;
-    color: var(--text);
-    text-shadow:
-      0 0 10px var(--glow),
-      0 0 30px rgba(0,255,231,0.4),
-      0 0 60px rgba(0,255,231,0.15);
-    line-height: 1;
-    min-width: 0.62em;
-    text-align: center;
-    position: relative;
-    transition: color 0.1s;
-  }
-
-  /* Ghost/dim digit behind for depth */
-  .digit::before {
-    content: attr(data-char);
-    position: absolute;
-    inset: 0;
-    color: rgba(0,255,231,0.06);
-    text-shadow: none;
-    filter: blur(0px);
-    z-index: -1;
-  }
-
-  .separator {
-    font-size: clamp(60px, 11vw, 100px);
-    font-weight: 900;
-    color: var(--glow);
-    text-shadow: 0 0 20px var(--glow);
-    animation: blink-sep 1s step-end infinite;
-    padding: 0 4px;
-    align-self: center;
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-
-  @keyframes blink-sep {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.15; }
-  }
-
-  /* Seconds bar */
-  .seconds-wrap {
-    margin-top: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    justify-content: center;
-  }
-
-  .seconds-label {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
+    background: rgba(245,201,138,0.07);
+    border: 1px solid rgba(245,201,138,0.22);
+    color: rgba(245,201,138,0.45);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
     letter-spacing: 3px;
-    color: rgba(0,255,231,0.4);
+    padding: 6px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
     text-transform: uppercase;
   }
+  .tz-btn:hover, .tz-btn.active {
+    background: rgba(245,201,138,0.16);
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 14px rgba(245,201,138,0.18);
+  }
 
-  .seconds-bar-track {
-    width: 200px;
-    height: 3px;
-    background: rgba(0,255,231,0.1);
+  /* Clock card */
+  .clock-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(245,201,138,0.14);
+    border-radius: 28px;
+    padding: 32px 52px 28px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(245,201,138,0.09);
     position: relative;
     overflow: hidden;
   }
-
-  .seconds-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--glow2), var(--glow));
-    box-shadow: 0 0 8px var(--glow);
-    width: 0%;
-    transition: width 0.95s linear;
+  .clock-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -10%;
+    width: 120%; height: 70%;
+    background: radial-gradient(ellipse, rgba(201,184,240,0.05) 0%, transparent 70%);
+    pointer-events: none;
   }
 
-  .seconds-num {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: var(--glow);
-    min-width: 24px;
-    text-align: right;
-  }
-
-  /* Date row */
-  .date-row {
-    margin-top: 20px;
+  /* Digits */
+  .clock {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+  }
+  .digit-group { display: flex; gap: 4px; }
+
+  .digit {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(110px, 22vw, 200px);
+    font-weight: 900;
+    line-height: 1;
+    min-width: 0.62em;
+    text-align: center;
+    background: linear-gradient(170deg, var(--cream) 0%, var(--gold) 45%, var(--gold2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 22px rgba(245,201,138,0.38));
   }
 
-  .date-line {
-    width: 40px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0,255,231,0.4));
+  .separator {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(90px, 18vw, 165px);
+    font-weight: 900;
+    color: var(--rose);
+    line-height: 1;
+    padding: 0 6px;
+    margin-bottom: 12px;
+    align-self: center;
+    animation: blink-sep 1s step-end infinite;
+    filter: drop-shadow(0 0 14px rgba(240,168,192,0.65));
   }
-  .date-line.right {
-    background: linear-gradient(90deg, rgba(0,255,231,0.4), transparent);
+  @keyframes blink-sep {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.12; }
+  }
+
+  /* Seconds */
+  .seconds-wrap {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+  }
+  .seconds-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: rgba(201,184,240,0.5);
+    text-transform: uppercase;
+  }
+  .seconds-bar-track {
+    width: 260px;
+    height: 4px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .seconds-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--lavender), var(--rose), var(--gold));
+    box-shadow: 0 0 10px rgba(240,168,192,0.5);
+    width: 0%;
+    transition: width 0.95s linear;
+  }
+  .seconds-num {
+    font-family: 'Cinzel', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--lavender);
+    min-width: 30px;
+    text-align: right;
+  }
+
+  /* Ornament divider */
+  .ornament-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 22px 0 12px;
+  }
+  .orn-line {
+    flex: 1; max-width: 90px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(245,201,138,0.35));
+  }
+  .orn-line.right { background: linear-gradient(90deg, rgba(245,201,138,0.35), transparent); }
+  .orn-diamond {
+    width: 7px; height: 7px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    box-shadow: 0 0 10px rgba(245,201,138,0.7);
   }
 
   .date-text {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 15px;
+    font-size: clamp(16px, 2.5vw, 24px);
     font-weight: 600;
     letter-spacing: 3px;
-    color: rgba(255,255,255,0.55);
+    color: rgba(253,240,224,0.6);
     text-transform: uppercase;
   }
 
-  /* Zone name */
   .zone-name {
-    margin-top: 10px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 13px;
-    font-weight: 400;
+    margin-top: 8px;
+    font-size: clamp(12px, 1.6vw, 15px);
+    font-weight: 500;
     letter-spacing: 5px;
-    color: rgba(0,255,231,0.35);
+    color: rgba(201,184,240,0.38);
     text-transform: uppercase;
   }
 
-  /* Corner decorations */
-  .corner {
-    position: fixed;
-    width: 30px; height: 30px;
-    opacity: 0.25;
+  .ramadhan-tag {
+    margin-top: 22px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: rgba(168,223,212,0.38);
+    text-transform: uppercase;
   }
-  .corner.tl { top: 16px; left: 16px; border-top: 1px solid var(--glow); border-left: 1px solid var(--glow); }
-  .corner.tr { top: 16px; right: 16px; border-top: 1px solid var(--glow); border-right: 1px solid var(--glow); }
-  .corner.bl { bottom: 16px; left: 16px; border-bottom: 1px solid var(--glow); border-left: 1px solid var(--glow); }
-  .corner.br { bottom: 16px; right: 16px; border-bottom: 1px solid var(--glow); border-right: 1px solid var(--glow); }
 </style>
 </head>
 <body>
 
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
+<!-- Stars -->
+<div class="stars" id="stars"></div>
 
+<!-- Moon -->
+<div class="moon-wrap">
+  <svg width="78" height="78" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M56 12C41 12 29 24 29 40C29 56 41 68 56 68C49 68 38 60 38 40C38 20 49 12 56 12Z" fill="#f5c98a" opacity="0.88"/>
+    <circle cx="22" cy="18" r="1.5" fill="#f9e4b0" opacity="0.8"/>
+    <circle cx="14" cy="33" r="1"   fill="#f9e4b0" opacity="0.6"/>
+    <circle cx="31" cy="8"  r="1"   fill="#f9e4b0" opacity="0.7"/>
+  </svg>
+</div>
+
+<!-- Lanterns -->
+<div class="lanterns">
+  <div class="lantern">
+    <svg width="34" height="68" viewBox="0 0 36 70" fill="none">
+      <line x1="18" y1="0" x2="18" y2="10" stroke="#f5c98a" stroke-width="1.5" opacity="0.5"/>
+      <ellipse cx="18" cy="13" rx="6" ry="3" fill="#f5c98a" opacity="0.4"/>
+      <rect x="6" y="13" width="24" height="36" rx="5" fill="rgba(240,168,192,0.1)" stroke="#f5c98a" stroke-width="1" opacity="0.55"/>
+      <ellipse cx="18" cy="31" rx="6" ry="9" fill="rgba(245,201,138,0.22)"/>
+      <ellipse cx="18" cy="49" rx="6" ry="3" fill="#f5c98a" opacity="0.35"/>
+      <line x1="14" y1="52" x2="12" y2="62" stroke="#f5c98a" stroke-width="1" opacity="0.35"/>
+      <line x1="18" y1="52" x2="18" y2="64" stroke="#f5c98a" stroke-width="1" opacity="0.35"/>
+      <line x1="22" y1="52" x2="24" y2="62" stroke="#f5c98a" stroke-width="1" opacity="0.35"/>
+    </svg>
+  </div>
+  <div class="lantern">
+    <svg width="34" height="68" viewBox="0 0 36 70" fill="none">
+      <line x1="18" y1="0" x2="18" y2="10" stroke="#c9b8f0" stroke-width="1.5" opacity="0.5"/>
+      <ellipse cx="18" cy="13" rx="6" ry="3" fill="#c9b8f0" opacity="0.4"/>
+      <rect x="6" y="13" width="24" height="36" rx="5" fill="rgba(201,184,240,0.1)" stroke="#c9b8f0" stroke-width="1" opacity="0.55"/>
+      <ellipse cx="18" cy="31" rx="6" ry="9" fill="rgba(201,184,240,0.22)"/>
+      <ellipse cx="18" cy="49" rx="6" ry="3" fill="#c9b8f0" opacity="0.35"/>
+      <line x1="14" y1="52" x2="12" y2="62" stroke="#c9b8f0" stroke-width="1" opacity="0.35"/>
+      <line x1="18" y1="52" x2="18" y2="64" stroke="#c9b8f0" stroke-width="1" opacity="0.35"/>
+      <line x1="22" y1="52" x2="24" y2="62" stroke="#c9b8f0" stroke-width="1" opacity="0.35"/>
+    </svg>
+  </div>
+</div>
+
+<!-- Mosque silhouette -->
+<div class="mosque-wrap">
+  <svg width="720" height="155" viewBox="0 0 720 155" fill="none">
+    <ellipse cx="360" cy="95" rx="82" ry="72" fill="#c9b8f0"/>
+    <rect x="278" y="95" width="164" height="60" fill="#c9b8f0"/>
+    <rect x="168" y="45" width="30" height="110" fill="#c9b8f0"/>
+    <ellipse cx="183" cy="45" rx="15" ry="26" fill="#c9b8f0"/>
+    <rect x="178" y="18" width="10" height="28" fill="#c9b8f0"/>
+    <rect x="522" y="45" width="30" height="110" fill="#c9b8f0"/>
+    <ellipse cx="537" cy="45" rx="15" ry="26" fill="#c9b8f0"/>
+    <rect x="532" y="18" width="10" height="28" fill="#c9b8f0"/>
+    <ellipse cx="237" cy="100" rx="42" ry="36" fill="#c9b8f0"/>
+    <rect x="195" y="100" width="84" height="55" fill="#c9b8f0"/>
+    <ellipse cx="483" cy="100" rx="42" ry="36" fill="#c9b8f0"/>
+    <rect x="441" y="100" width="84" height="55" fill="#c9b8f0"/>
+    <rect x="0" y="152" width="720" height="4" fill="#c9b8f0"/>
+  </svg>
+</div>
+
+<!-- Main UI -->
 <div class="wrapper">
+  <div class="greeting">✦ Marhaban Ya Ramadhan ✦</div>
+  <div class="ramadhan-title">Jam Indonesia</div>
+
   <div class="tz-row">
     <button class="tz-btn active" onclick="setZone('WIB')">WIB</button>
     <button class="tz-btn" onclick="setZone('WITA')">WITA</button>
     <button class="tz-btn" onclick="setZone('WIT')">WIT</button>
   </div>
 
-  <div class="clock">
-    <div class="digit-group">
-      <span class="digit" id="h1" data-char="0">0</span>
-      <span class="digit" id="h2" data-char="0">0</span>
+  <div class="clock-card">
+    <div class="clock">
+      <div class="digit-group">
+        <span class="digit" id="h1">0</span>
+        <span class="digit" id="h2">0</span>
+      </div>
+      <span class="separator">:</span>
+      <div class="digit-group">
+        <span class="digit" id="m1">0</span>
+        <span class="digit" id="m2">0</span>
+      </div>
     </div>
-    <span class="separator">:</span>
-    <div class="digit-group">
-      <span class="digit" id="m1" data-char="0">0</span>
-      <span class="digit" id="m2" data-char="0">0</span>
+
+    <div class="seconds-wrap">
+      <span class="seconds-label">Detik</span>
+      <div class="seconds-bar-track">
+        <div class="seconds-bar-fill" id="sec-bar"></div>
+      </div>
+      <span class="seconds-num" id="sec-num">00</span>
     </div>
+
+    <div class="ornament-row">
+      <div class="orn-line"></div>
+      <div class="orn-diamond"></div>
+      <div class="orn-line right"></div>
+    </div>
+
+    <div class="date-text" id="date-text">—</div>
+    <div class="zone-name" id="zone-name">Waktu Indonesia Barat</div>
   </div>
 
-  <div class="seconds-wrap">
-    <span class="seconds-label">detik</span>
-    <div class="seconds-bar-track">
-      <div class="seconds-bar-fill" id="sec-bar"></div>
-    </div>
-    <span class="seconds-num" id="sec-num">00</span>
-  </div>
-
-  <div class="date-row">
-    <div class="date-line"></div>
-    <span class="date-text" id="date-text">—</span>
-    <div class="date-line right"></div>
-  </div>
-
-  <div class="zone-name" id="zone-name">Waktu Indonesia Barat</div>
+  <div class="ramadhan-tag">☽ 1446 H ☽</div>
 </div>
 
 <script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${(Math.random()*3+2).toFixed(1)}s;--delay:-${(Math.random()*5).toFixed(1)}s;`;
+    starsEl.appendChild(s);
+  }
+
+  // Clock
   const zones = {
     WIB:  { offset: 7,  label: 'Waktu Indonesia Barat' },
     WITA: { offset: 8,  label: 'Waktu Indonesia Tengah' },
     WIT:  { offset: 9,  label: 'Waktu Indonesia Timur' },
   };
-
-  const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
-
+  const days   = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   let currentZone = 'WIB';
 
   function setZone(z) {
     currentZone = z;
-    document.querySelectorAll('.tz-btn').forEach(b => {
-      b.classList.toggle('active', b.textContent === z);
-    });
+    document.querySelectorAll('.tz-btn').forEach(b => b.classList.toggle('active', b.textContent === z));
     document.getElementById('zone-name').textContent = zones[z].label;
     tick();
   }
 
-  function pad(n) { return String(n).padStart(2, '0'); }
+  function pad(n) { return String(n).padStart(2,'0'); }
 
   function tick() {
     const now = new Date();
     const utc = now.getTime() + now.getTimezoneOffset() * 60000;
     const local = new Date(utc + zones[currentZone].offset * 3600000);
+    const H = pad(local.getHours()), M = pad(local.getMinutes()), S = local.getSeconds();
 
-    const H = pad(local.getHours());
-    const M = pad(local.getMinutes());
-    const S = local.getSeconds();
-
-    const h1 = document.getElementById('h1');
-    const h2 = document.getElementById('h2');
-    const m1 = document.getElementById('m1');
-    const m2 = document.getElementById('m2');
-
-    h1.textContent = H[0]; h1.setAttribute('data-char', H[0]);
-    h2.textContent = H[1]; h2.setAttribute('data-char', H[1]);
-    m1.textContent = M[0]; m1.setAttribute('data-char', M[0]);
-    m2.textContent = M[1]; m2.setAttribute('data-char', M[1]);
-
+    document.getElementById('h1').textContent = H[0];
+    document.getElementById('h2').textContent = H[1];
+    document.getElementById('m1').textContent = M[0];
+    document.getElementById('m2').textContent = M[1];
     document.getElementById('sec-bar').style.width = (S / 59 * 100) + '%';
     document.getElementById('sec-num').textContent = pad(S);
-
-    const dateStr = `${days[local.getDay()]}, ${local.getDate()} ${months[local.getMonth()]} ${local.getFullYear()}`;
-    document.getElementById('date-text').textContent = dateStr;
+    document.getElementById('date-text').textContent =
+      `${days[local.getDay()]}, ${local.getDate()} ${months[local.getMonth()]} ${local.getFullYear()}`;
   }
 
   tick();
