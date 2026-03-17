@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jam Indonesia</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000000;
+    --glow: #00ffe7;
+    --glow2: #0099ff;
+    --text: #ffffff;
+    --dim: rgba(0,255,231,0.15);
+    --dim2: rgba(0,153,255,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: 'Orbitron', monospace;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 99;
+  }
+
+  .wrapper {
+    text-align: center;
+    position: relative;
+  }
+
+  /* Ambient glow background */
+  .wrapper::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(0,255,231,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    animation: pulse-bg 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-bg {
+    0%, 100% { opacity: 0.6; transform: translate(-50%,-50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%,-50%) scale(1.05); }
+  }
+
+  /* Timezone label */
+  .tz-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+
+  .tz-btn {
+    background: transparent;
+    border: 1px solid rgba(0,255,231,0.3);
+    color: rgba(0,255,231,0.5);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .tz-btn:hover, .tz-btn.active {
+    border-color: var(--glow);
+    color: var(--glow);
+    background: var(--dim);
+    box-shadow: 0 0 12px rgba(0,255,231,0.2);
+  }
+
+  /* Main clock digits */
+  .clock {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+
+  .digit-group {
+    display: flex;
+    gap: 2px;
+  }
+
+  .digit {
+    font-size: clamp(72px, 14vw, 120px);
+    font-weight: 900;
+    color: var(--text);
+    text-shadow:
+      0 0 10px var(--glow),
+      0 0 30px rgba(0,255,231,0.4),
+      0 0 60px rgba(0,255,231,0.15);
+    line-height: 1;
+    min-width: 0.62em;
+    text-align: center;
+    position: relative;
+    transition: color 0.1s;
+  }
+
+  /* Ghost/dim digit behind for depth */
+  .digit::before {
+    content: attr(data-char);
+    position: absolute;
+    inset: 0;
+    color: rgba(0,255,231,0.06);
+    text-shadow: none;
+    filter: blur(0px);
+    z-index: -1;
+  }
+
+  .separator {
+    font-size: clamp(60px, 11vw, 100px);
+    font-weight: 900;
+    color: var(--glow);
+    text-shadow: 0 0 20px var(--glow);
+    animation: blink-sep 1s step-end infinite;
+    padding: 0 4px;
+    align-self: center;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  @keyframes blink-sep {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.15; }
+  }
+
+  /* Seconds bar */
+  .seconds-wrap {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .seconds-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: rgba(0,255,231,0.4);
+    text-transform: uppercase;
+  }
+
+  .seconds-bar-track {
+    width: 200px;
+    height: 3px;
+    background: rgba(0,255,231,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .seconds-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--glow2), var(--glow));
+    box-shadow: 0 0 8px var(--glow);
+    width: 0%;
+    transition: width 0.95s linear;
+  }
+
+  .seconds-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--glow);
+    min-width: 24px;
+    text-align: right;
+  }
+
+  /* Date row */
+  .date-row {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .date-line {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,255,231,0.4));
+  }
+  .date-line.right {
+    background: linear-gradient(90deg, rgba(0,255,231,0.4), transparent);
+  }
+
+  .date-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+  }
+
+  /* Zone name */
+  .zone-name {
+    margin-top: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 5px;
+    color: rgba(0,255,231,0.35);
+    text-transform: uppercase;
+  }
+
+  /* Corner decorations */
+  .corner {
+    position: fixed;
+    width: 30px; height: 30px;
+    opacity: 0.25;
+  }
+  .corner.tl { top: 16px; left: 16px; border-top: 1px solid var(--glow); border-left: 1px solid var(--glow); }
+  .corner.tr { top: 16px; right: 16px; border-top: 1px solid var(--glow); border-right: 1px solid var(--glow); }
+  .corner.bl { bottom: 16px; left: 16px; border-bottom: 1px solid var(--glow); border-left: 1px solid var(--glow); }
+  .corner.br { bottom: 16px; right: 16px; border-bottom: 1px solid var(--glow); border-right: 1px solid var(--glow); }
+</style>
+</head>
+<body>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="wrapper">
+  <div class="tz-row">
+    <button class="tz-btn active" onclick="setZone('WIB')">WIB</button>
+    <button class="tz-btn" onclick="setZone('WITA')">WITA</button>
+    <button class="tz-btn" onclick="setZone('WIT')">WIT</button>
+  </div>
+
+  <div class="clock">
+    <div class="digit-group">
+      <span class="digit" id="h1" data-char="0">0</span>
+      <span class="digit" id="h2" data-char="0">0</span>
+    </div>
+    <span class="separator">:</span>
+    <div class="digit-group">
+      <span class="digit" id="m1" data-char="0">0</span>
+      <span class="digit" id="m2" data-char="0">0</span>
+    </div>
+  </div>
+
+  <div class="seconds-wrap">
+    <span class="seconds-label">detik</span>
+    <div class="seconds-bar-track">
+      <div class="seconds-bar-fill" id="sec-bar"></div>
+    </div>
+    <span class="seconds-num" id="sec-num">00</span>
+  </div>
+
+  <div class="date-row">
+    <div class="date-line"></div>
+    <span class="date-text" id="date-text">—</span>
+    <div class="date-line right"></div>
+  </div>
+
+  <div class="zone-name" id="zone-name">Waktu Indonesia Barat</div>
+</div>
+
+<script>
+  const zones = {
+    WIB:  { offset: 7,  label: 'Waktu Indonesia Barat' },
+    WITA: { offset: 8,  label: 'Waktu Indonesia Tengah' },
+    WIT:  { offset: 9,  label: 'Waktu Indonesia Timur' },
+  };
+
+  const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+
+  let currentZone = 'WIB';
+
+  function setZone(z) {
+    currentZone = z;
+    document.querySelectorAll('.tz-btn').forEach(b => {
+      b.classList.toggle('active', b.textContent === z);
+    });
+    document.getElementById('zone-name').textContent = zones[z].label;
+    tick();
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick() {
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const local = new Date(utc + zones[currentZone].offset * 3600000);
+
+    const H = pad(local.getHours());
+    const M = pad(local.getMinutes());
+    const S = local.getSeconds();
+
+    const h1 = document.getElementById('h1');
+    const h2 = document.getElementById('h2');
+    const m1 = document.getElementById('m1');
+    const m2 = document.getElementById('m2');
+
+    h1.textContent = H[0]; h1.setAttribute('data-char', H[0]);
+    h2.textContent = H[1]; h2.setAttribute('data-char', H[1]);
+    m1.textContent = M[0]; m1.setAttribute('data-char', M[0]);
+    m2.textContent = M[1]; m2.setAttribute('data-char', M[1]);
+
+    document.getElementById('sec-bar').style.width = (S / 59 * 100) + '%';
+    document.getElementById('sec-num').textContent = pad(S);
+
+    const dateStr = `${days[local.getDay()]}, ${local.getDate()} ${months[local.getMonth()]} ${local.getFullYear()}`;
+    document.getElementById('date-text').textContent = dateStr;
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
